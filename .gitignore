@@ -7,7 +7,9 @@ data/
 *.png
 *.pdf
 *.svg
+*.pth
 *.sh
+*.pt
 .ipynb_checkpoints/
 .DS_Store
 job.slurm.*
