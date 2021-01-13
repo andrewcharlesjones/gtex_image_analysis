@@ -17,7 +17,7 @@ else:
     DATA_DIR = "/projects/BEE/GTExV8_dpcca"
     METADATA_PATH = "/tigress/BEE/gtex/dbGaP_index/v8_data_sample_annotations/GTEx_Analysis_2017-06-05_v8_Annotations_SampleAttributesDS.txt"
     SAVE_PATH = "/tigress/aj13/gtex_image_analysis/autoencoder"
-    NUM_SAMPLES = None
+    NUM_SAMPLES = 10
 
 SAVE_FNAME = "train.pth"
 IMG_DIR = os.path.join(DATA_DIR, "images")
