@@ -7,15 +7,18 @@ from os.path import join as pjoin
 import socket
 import matplotlib.pyplot as plt
 import seaborn as sns
+import umap
 
 if socket.gethostname() == "andyjones":
     EXPRESSION_PATH = "/Users/andrewjones/Documents/beehive/multimodal_bio/organize_unnormalized_data/data/small_gene_tpm.gct"
     METADATA_PATH = "/Users/andrewjones/Documents/beehive/gtex/v8_metadata/GTEx_Analysis_2017-06-05_v8_Annotations_SampleAttributesDS.txt"
+    GTEX_COLORS_PATH = "../../data/colors/tissue_gtex_colors.tsv"
 else:
     EXPRESSION_PATH = "/tigress/aj13/gtexv8/GTEx_Analysis_2017-06-05_v8_RSEMv1.3.0_gene_tpm.gct"
     METADATA_PATH = "/tigress/BEE/gtex/dbGaP_index/v8_data_sample_annotations/GTEx_Analysis_2017-06-05_v8_Annotations_SampleAttributesDS.txt"
+    GTEX_COLORS_PATH = "/projects/BEE/RNAseq/RNAseq_dev/Analysis/tissue_gtex_colors.tsv"
 
-NUM_GENES = 40
+NUM_GENES = 20000
 N_COMPONENTS = 2
 
 import matplotlib
@@ -51,7 +54,13 @@ def main():
 
     expression_data = expression_data.transpose()[samples_with_metadata].transpose()
 
-    tissues = v8_metadata.SMTS.values
+    tissues = v8_metadata.SMTSD.values
+
+    # import ipdb; ipdb.set_trace()
+    expression_data = expression_data[tissues != "Kidney - Medulla"]
+    v8_metadata = v8_metadata[tissues != "Kidney - Medulla"]
+    tissues = tissues[tissues != "Kidney - Medulla"]
+    
 
     assert expression_data.shape[0] == v8_metadata.shape[0]
     assert np.array_equal(expression_data.index.values, v8_metadata.index.values)
@@ -88,26 +97,45 @@ def main():
     expression_data = expression_data - expression_data.mean()
 
 
-    # ------- Run PCA ---------
+    # ------- Run PCA/UMAP ---------
 
-    pca = PCA(n_components=N_COMPONENTS)
-    expression_reduced = pca.fit_transform(expression_data)
+    # pca = PCA(n_components=N_COMPONENTS)
+    # expression_reduced = pca.fit_transform(expression_data)
+
+    pca = PCA(n_components=min(expression_data.shape[1], 50))
+    umap_data = pca.fit_transform(expression_data)
+    reducer = umap.UMAP()
+    expression_reduced = reducer.fit_transform(umap_data)
+    
+    expression_reduced_df = pd.DataFrame(expression_reduced)
+    expression_reduced_df['tissues'] = tissues
+    expression_reduced_df.to_csv("./out/expression_reduced.csv")
 
     # ------- Plot ---------
 
-    plt.figure(figsize=(7, 6))
-    expression_reduced_df = pd.DataFrame(expression_reduced, columns=["PC1", "PC2"])
-    expression_reduced_df['tissue'] = tissues
-    sns.scatterplot(data=expression_reduced_df, x="PC1", y="PC2", hue="tissue")
-    plt.xlabel("PC1")
-    plt.ylabel("PC2")
-    plt.title("PCA, expression")
+    # Load GTEx colors
+    gtex_colors = pd.read_table(GTEX_COLORS_PATH)
+    
+    color_lists = gtex_colors.tissue_color_rgb.str.split(",").values
+    reds = [int(x[0]) / 255. for x in color_lists]
+    greens = [int(x[1]) / 255. for x in color_lists]
+    blues = [int(x[2]) / 255. for x in color_lists]
+    zipped_colors = [np.array([reds[ii], greens[ii], blues[ii]]) for ii in range(color_lists.shape[0])]
+    gtex_colors['tissue_color_rgb_normalized'] = zipped_colors
+    color_df = pd.DataFrame(tissues, columns=['tissue'])
+    color_df = pd.merge(color_df, gtex_colors[['tissue_name', 'tissue_color_rgb_normalized']], left_on='tissue', right_on='tissue_name', how='left')
+
+    plt.figure(figsize=(20, 20))
+    plt.scatter(expression_reduced[:, 0], expression_reduced[:, 1], c=color_df.tissue_color_rgb_normalized.values)
+    plt.xlabel("UMAP1")
+    plt.ylabel("UMAP2")
+    plt.title("UMAP, expression")
     plt.legend([],[], frameon=False)
     plt.tight_layout()
-    plt.savefig("./out/pca_expression.png")
+    plt.savefig("./out/dimreduction_expression.png")
     plt.show()
 
-    import ipdb; ipdb.set_trace()
+    # import ipdb; ipdb.set_trace()
 
 
 if __name__ == '__main__':

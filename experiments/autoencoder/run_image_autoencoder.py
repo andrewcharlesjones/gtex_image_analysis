@@ -24,8 +24,6 @@ import matplotlib.pyplot as plt
 torch.manual_seed(1)
 
 if socket.gethostname() == "andyjones":
-    BASE_DIR = "/Users/andrewjones/Documents/beehive/gtex_data_sample"
-    SAVE_DIR = "/Users/andrewjones/Documents/beehive/multimodal_bio/pca/images/out"
     DATA_DIR = "/Users/andrewjones/Documents/beehive/gtex_image_analysis/data"
     RANDOM_CROP_SIZE = 128
     NUM_EPOCHS = 3
@@ -34,20 +32,17 @@ if socket.gethostname() == "andyjones":
     NUM_CROPS_TEST = 2
     SAVE_MODEL_EVERY = 5
 else:
-    BASE_DIR = "/projects/BEE/GTExV8_dpcca"
-    SAVE_DIR = "/scratch/gpfs/aj13/autoencoder/out"
     DATA_DIR = "/tigress/aj13/gtex_image_analysis/autoencoder/"
     RANDOM_CROP_SIZE = 128
-    NUM_EPOCHS = 12000
+    NUM_EPOCHS = 3 # 12000
     LEARNING_RATE = 0.001
     BATCH_SIZE = 128
     NUM_CROPS_TEST = 20
     SAVE_MODEL_EVERY = 20
 
-IMAGES_DIR = pjoin(BASE_DIR, "images")
 IM_SIZE = (1000, 1000, 3)
 DATA_FILE = "train.pth"
-LOAD_MODEL = False
+LOAD_MODEL = True
 LATENT_Z_SIZE = 1024
 RESIZE_SIZE = 512
 
@@ -175,8 +170,7 @@ def main():
     plot_loss(loss_history)
 
     # Reconstruction plot
-    plot_example(ims_test_examples, recons_test_examples,
-                 "./out/reconstructions.png")
+    plot_example(ims_test_examples, recons_test_examples, "./out/reconstructions.png")
 
     # Save latent representations
     np.save("./out/latent_z.npy", latent_z_all)

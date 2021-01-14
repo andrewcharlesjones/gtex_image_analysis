@@ -11,7 +11,7 @@ from PIL import Image
 if socket.gethostname() == "andyjones":
     DATA_DIR = "/Users/andrewjones/Documents/beehive/gtex_data_sample"
     METADATA_PATH = "/Users/andrewjones/Documents/beehive/gtex/v8_metadata/GTEx_Analysis_2017-06-05_v8_Annotations_SampleAttributesDS.txt"
-    SAVE_PATH = "/Users/andrewjones/Documents/beehive/gtex_image_analysis/data"
+    SAVE_PATH = "/Users/andrewjones/Documents/beehive/gtex_image_analysis/data/autoencoder"
     NUM_SAMPLES = 10
 else:
     DATA_DIR = "/projects/BEE/GTExV8_dpcca"
