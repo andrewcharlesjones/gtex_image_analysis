@@ -10,13 +10,14 @@ NUM_GENES = 20000
 N_COMPONENTS = 2
 
 import matplotlib
-font = {'size': 30}
+font = {'size': 60}
 matplotlib.rc('font', **font)
 matplotlib.rcParams['text.usetex'] = True
 
 
 expression_reduced = pd.read_csv("./out/expression_reduced.csv", index_col=0)
 expression_reduced = expression_reduced.values
+tissues = expression_reduced[:, 2]
 # import ipdb; ipdb.set_trace()
 
 # Load GTEx colors
@@ -31,7 +32,7 @@ gtex_colors['tissue_color_rgb_normalized'] = zipped_colors
 color_df = pd.DataFrame(tissues, columns=['tissue'])
 color_df = pd.merge(color_df, gtex_colors[['tissue_name', 'tissue_color_rgb_normalized']], left_on='tissue', right_on='tissue_name', how='left')
 
-plt.figure(figsize=(7, 6))
+plt.figure(figsize=(23, 20))
 plt.scatter(expression_reduced[:, 0], expression_reduced[:, 1], c=color_df.tissue_color_rgb_normalized.values)
 plt.xlabel("UMAP1")
 plt.ylabel("UMAP2")

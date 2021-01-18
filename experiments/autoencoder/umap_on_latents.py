@@ -24,7 +24,7 @@ PERPLEXITY = 100
 
 
 import matplotlib
-font = {'size': 30}
+font = {'size': 60}
 matplotlib.rc('font', **font)
 matplotlib.rcParams['text.usetex'] = True
 
@@ -121,7 +121,7 @@ def main():
 
     umap_x, umap_y = transformed_df.umap1.values[rand_idx], transformed_df.umap2.values[rand_idx]
 
-    fig, ax = plt.subplots(figsize=(20, 20))
+    fig, ax = plt.subplots(figsize=(23, 20))
     ax.scatter(umap_x, umap_y)
 
     # Get a unique color for each tissue. We'll color the border of each image with this color.
@@ -141,7 +141,8 @@ def main():
     
 
     # Look over images, plotting each one at the correct location
-    
+    font = {'size': 15}
+    matplotlib.rc('font', **font)
     for x0, y0, path, tissue in zip(umap_x, umap_y, fnames_to_plot, tissues_to_plot):
 
         # Get tissue's color.
@@ -152,13 +153,15 @@ def main():
             facecolor=curr_color, boxstyle='round', color=curr_color))
         ax.add_artist(ab)
 
+    font = {'size': 60}
+    matplotlib.rc('font', **font)
+
     plt.xlabel("UMAP1")
     plt.ylabel("UMAP2")
     plt.title("UMAP, images")
     plt.tight_layout()
     # Save figure.
     plt.savefig("./out/umap_on_latents_imgs.png")
-    plt.clf()
     plt.close()
 
     print("Done")
